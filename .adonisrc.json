@@ -23,7 +23,8 @@
     "@adonisjs/core",
     "adonis5-swagger",
     "@adonisjs/lucid",
-    "@adonisjs/auth"
+    "@adonisjs/auth",
+    "@adonisjs/redis"
   ],
   "aceProviders": [
     "@adonisjs/repl"

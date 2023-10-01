@@ -15,9 +15,17 @@ export default {
 				title: 'Post-comments',
 				version: '1.0.0',
 				description: 'Documentation des api pour la mise en place de l\'application de publication de post'
+			},
+			components: {
+				securitySchemes: {
+					bearerAuth: {
+						type: "http",
+						scheme: "bearer",
+						bearerFormat: "JWT"
+					}
+				}
 			}
 		},
-
 		apis: [
 			'app/**/*.ts',
 			'docs/swagger/**/*.yml',
@@ -26,5 +34,5 @@ export default {
 		basePath: '/'
 	},
 	mode: process.env.NODE_ENV === 'production' ? 'PRODUCTION' : 'RUNTIME',
-  specFilePath: 'docs/swagger.json'
+	specFilePath: 'docs/swagger.json'
 } as SwaggerConfig

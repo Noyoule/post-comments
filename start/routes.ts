@@ -18,8 +18,24 @@
 |
 */
 
-import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
+import Route from '@ioc:Adonis/Core/Route'
+import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
+
+
+Route.get('/redis/health', async ({ response }) => {
+  const report = await HealthCheck.getReport()
+  
+  return report.healthy
+    ? response.ok(report)
+    : response.badRequest(report)
 })
+
+Route.group(() => {
+  Route.post('/register', 'auth/AuthenticatesController.register')
+  Route.post('/login', 'auth/AuthenticatesController.login')
+}).prefix('/api/v1')
+
+Route.group(() => {
+  Route.post('/logout', 'auth/AuthenticatesController.logout')
+}).prefix('/api/v1').middleware('auth:api')
