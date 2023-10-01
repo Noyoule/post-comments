@@ -12,7 +12,7 @@ export default class AuthenticatesController {
    *    post:
    *       summary: Create a new user
    *       tags:
-   *         - User
+   *         - Login_Register
    *       requestBody:
    *          description: A json object to create the user
    *          required: true
@@ -59,7 +59,7 @@ export default class AuthenticatesController {
    *    post:
    *       summary: Connect a user
    *       tags:
-   *         - User
+   *         - Login_Register
    *       requestBody:
    *          description: A json object to connect the user
    *          required: true
@@ -106,7 +106,7 @@ export default class AuthenticatesController {
    *         - bearerAuth: []
    *       summary: Logout the connected user
    *       tags:
-   *         - User
+   *         - Login_Register
    *       responses:
    *         '200':
    *            description: User disconnected
