@@ -3,6 +3,7 @@ import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:
 import User from './User'
 import Media from './Media'
 import Comment from './Comment'
+import Like from './Like'
 
 export default class Post extends BaseModel {
   @column({ isPrimary: true })
@@ -10,6 +11,9 @@ export default class Post extends BaseModel {
 
   @column()
   public content: string
+
+  @column()
+  public userId: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -25,4 +29,8 @@ export default class Post extends BaseModel {
 
   @hasMany(()=> Comment)
   public comments: HasMany<typeof Comment>
+
+  @hasMany(()=> Like)
+  public likes: HasMany<typeof Like>
+
 }

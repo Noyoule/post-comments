@@ -18,6 +18,22 @@
 |
 */
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Unauthorized:
+ *       type: object
+ *       properties:
+ *         errors:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               message:
+ *                 type: string
+ * 
+ */
 
 import Route from '@ioc:Adonis/Core/Route'
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
@@ -38,4 +54,7 @@ Route.group(() => {
 
 Route.group(() => {
   Route.post('/logout', 'auth/AuthenticatesController.logout')
+  Route.post('/post', 'post/PostsController.create')
+  Route.post('/post/like/toggle/:postId', 'post/PostsController.likeToggle')
+  Route.delete('/post/delete/:postId', 'post/PostsController.deletePost')
 }).prefix('/api/v1').middleware('auth:api')

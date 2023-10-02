@@ -122,15 +122,7 @@ export default class AuthenticatesController {
    *            content:
    *              application/json:
    *                schema:
-   *                  type: object
-   *                  properties:
-   *                    errors:
-   *                      type: array
-   *                      items:
-   *                        type: object
-   *                        properties:
-   *                          message:
-   *                            type: string
+   *                  $ref: '#/components/schemas/Unauthorized'
    * 
    */
     public async logout({auth}): Promise<logoutResponse>{
