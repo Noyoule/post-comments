@@ -7,10 +7,17 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
       table.string('content',255)
+      
       table
       .integer('post_id')
       .unsigned()
       .references('posts.id')
+      .onDelete('CASCADE')
+
+      table
+      .integer('user_id')
+      .unsigned()
+      .references('users.id')
       .onDelete('CASCADE')
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

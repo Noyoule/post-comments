@@ -128,4 +128,5 @@ export default class AuthenticatesController {
     public async logout({auth}): Promise<logoutResponse>{
       return AuthenticateService.logout(auth)
     }
+    
 }
