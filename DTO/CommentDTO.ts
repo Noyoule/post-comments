@@ -3,6 +3,7 @@ interface Comment {
         name: string
         avatar: string
     }
+    id: number
     content: string
     created_at: string | null
 }

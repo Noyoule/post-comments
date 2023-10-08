@@ -6,95 +6,11 @@ import badRequest from "DTO/ResponsesDTO";
 
 export default class AuthenticatesController {
 
-    /**
-   * @swagger
-   * /api/v1/register:
-   *    post:
-   *       summary: Create a new user
-   *       tags:
-   *         - Login_Register
-   *       requestBody:
-   *          description: A json object to create the user
-   *          required: true
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                properties:
-   *                  email:
-   *                    type: string
-   *                  name:
-   *                    type: string
-   *                  password:
-   *                    type: string
-   *       responses:
-   *         '200':
-   *            description: User created
-   *            content:
-   *              application/json:
-   *                schema:
-   *                  type: object
-   *                  properties:
-   *                    message:
-   *                      type: string
-   *                    token:
-   *                      type: string
-   *         '400':
-   *            description: Bad request
-   *            content:
-   *              application/json:
-   *                schema:
-   *                  type: object
-   *                  properties:
-   *                    message:
-   *                      type: string
-   * 
-   */
     public async register({auth, request}): Promise<registerResponse|badRequest>{
       return AuthenticateService.register(auth,request)
     }
- /**
-   * @swagger
-   * /api/v1/login:
-   *    post:
-   *       summary: Connect a user
-   *       tags:
-   *         - Login_Register
-   *       requestBody:
-   *          description: A json object to connect the user
-   *          required: true
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *                properties:
-   *                  email:
-   *                    type: string
-   *                  password:
-   *                    type: string
-   *       responses:
-   *         '200':
-   *            description: User logged in
-   *            content:
-   *              application/json:
-   *                schema:
-   *                  type: object
-   *                  properties:
-   *                    message:
-   *                      type: string
-   *                    token:
-   *                      type: string
-   *         '400':
-   *            description: Bad request
-   *            content:
-   *              application/json:
-   *                schema:
-   *                  type: object
-   *                  properties:
-   *                    message:
-   *                      type: string
-   * 
-   */
+ 
+    
     public async login({auth, request}): Promise<loginResponse|badRequest>{
         return AuthenticateService.login(auth,request)
     }

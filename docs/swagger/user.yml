@@ -1,0 +1,101 @@
+/api/v1/register:
+  post:
+    summary: Create a new user
+    tags:
+      - Login_Register
+    requestBody:
+      description: A json object to create the user
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              name:
+                type: string
+              password:
+                type: string
+    responses:
+      "200":
+        description: User created
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                token:
+                  type: string
+      "400":
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+/api/v1/login:
+  post:
+    summary: Connect a user
+    tags:
+      - Login_Register
+    requestBody:
+      description: A json object to connect the user
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+              password:
+                type: string
+    responses:
+      "200":
+        description: User logged in
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                token:
+                  type: string
+      "400":
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+/api/v1/logout:
+  post:
+    security:
+      - bearerAuth: []
+    summary: Logout the connected user
+    tags:
+      - Login_Register
+    responses:
+      "200":
+        description: User disconnected
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+      "401":
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Unauthorized"

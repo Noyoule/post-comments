@@ -18,6 +18,7 @@ export default class CommentService {
                             name: comment.user.name,
                             avatar: "avatar",
                         },
+                        id: comment.id,
                         content: comment.content,
                         created_at: comment.createdAt.toJSON(),
                     };

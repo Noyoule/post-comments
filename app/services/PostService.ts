@@ -3,7 +3,6 @@ import Media from 'App/Models/Media'
 import Post from "App/Models/Post"
 import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
-import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class PostService {
 
@@ -104,6 +103,7 @@ export default class PostService {
                     avatar: 'avatar',
                     name: post.user.name
                 },
+                created_at: post.createdAt.toJSON(),
                 content: post.content,
                 likes: post.likes.length,
                 medias: await Promise.all(post.medias.map(async (media) => {
@@ -116,6 +116,7 @@ export default class PostService {
                             name: comment.user.name,
                             avatar: "avatar",
                         },
+                        id: comment.id,
                         content: comment.content,
                         created_at: comment.createdAt.toJSON(),
                     };
@@ -129,8 +130,12 @@ export default class PostService {
     }
 
     //récupérer une liste paginer de tous les posts
-    public async getAll(page: number, limit: number) {
-        const posts = await Database.from('posts').paginate(page, limit)
+    public static async getAll(page: number, limit: number){
+        const posts = await Post.query().preload('medias',(mediaQuery)=>{
+         mediaQuery.select('name')
+        }).preload('user',(userQuery)=>{
+            userQuery.select('name','email')
+        }).paginate(page, limit)
         return posts.toJSON()
     }
 }

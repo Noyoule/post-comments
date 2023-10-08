@@ -7,6 +7,7 @@ interface Post {
         name: string
         avatar: string
     }
+    id: number
     content: string
     likes: number
     medias: string[]
@@ -16,12 +17,13 @@ interface GetPostResponse {
         name: string
         avatar: string
     }
+    created_at:string|null
     content: string
     likes: number
-    medias: string[]
+    medias: string[] 
     comments: Comment[]
 }
-
+ 
 interface DeletePostResponse {
     message: string
 }
