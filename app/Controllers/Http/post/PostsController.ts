@@ -1,6 +1,7 @@
 // import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 import PostService from "App/services/PostService";
+import { GetPostResponse, PostResponse } from "App/Dto";
 
 export default class PostsController {
     public async create({ auth, request, response }): Promise<PostResponse> {

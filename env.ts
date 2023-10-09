@@ -28,4 +28,3 @@ export default Env.rules({
 	REDIS_PORT: Env.schema.number(),
 	REDIS_PASSWORD: Env.schema.string.optional(),
 })
-

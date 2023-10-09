@@ -1,6 +1,7 @@
 // import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 import CommentService from "App/services/CommentService";
+import { CommentResponse, GetAllCommentsResponse } from "App/Dto";
 
 export default class CommentsController {
 

@@ -1,8 +1,10 @@
-interface PostResponse {
+import { Comment } from "./CommentDTO"
+
+export interface PostResponse {
     message: string
 }
 
-interface Post {
+export interface Post {
     user: {
         name: string
         avatar: string
@@ -12,7 +14,7 @@ interface Post {
     likes: number
     medias: string[]
 }
-interface GetPostResponse {
+export interface GetPostResponse {
     user: {
         name: string
         avatar: string
@@ -24,11 +26,11 @@ interface GetPostResponse {
     comments: Comment[]
 }
  
-interface DeletePostResponse {
+export interface DeletePostResponse {
     message: string
 }
 
-interface GetAllPostResponse {
+export interface GetAllPostResponse {
     "meta": {
         "total": number,
         "per_page": number,

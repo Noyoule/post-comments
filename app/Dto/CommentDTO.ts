@@ -1,4 +1,4 @@
-interface Comment {
+export interface Comment {
     user: {
         name: string
         avatar: string
@@ -8,13 +8,12 @@ interface Comment {
     created_at: string | null
 }
 
-interface GetAllCommentsResponse {
+export interface GetAllCommentsResponse {
     message: string
     data: Comment[]
 }
 
 
-
-interface CommentResponse {
+export interface CommentResponse {
     message: string
 }

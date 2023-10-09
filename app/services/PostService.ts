@@ -3,6 +3,7 @@ import Media from 'App/Models/Media'
 import Post from "App/Models/Post"
 import Drive from '@ioc:Adonis/Core/Drive'
 import Env from '@ioc:Adonis/Core/Env'
+import { GetPostResponse, PostResponse } from 'App/Dto'
 
 export default class PostService {
 

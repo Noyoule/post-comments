@@ -1,0 +1,20 @@
+{
+    "USER": {
+        "create": "User create successfully",
+        "login": "User login successfully",
+        "logout": "User logout successfully"
+    },
+
+    "POST": {
+        "create": "Post create successfully",
+        "get": "Post get successfully",
+        "delete": "Post deleted successfully",
+        "getAll": "all publications obtained successfully",
+        "likeOrDislike": "likes updated on the post"
+    },
+    
+    "COMMENT": {
+        "create":"Comment create successfully",
+        "delete": "Comment deleted successfully"
+    }
+}

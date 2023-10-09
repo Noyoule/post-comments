@@ -1,26 +1,25 @@
 import User from "App/Models/User";
-import { loginResponse, logoutResponse, registerResponse } from "DTO/AuthenticateDTO";
-import badRequest from "DTO/ResponsesDTO";
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { HTTP_RESPONSE_STATUS, LoggerInDto, RESPONSE_MESSAGES, ResponseTypeDTO, UserDto, badRequest, loginResponse, logoutResponse } from "App/Dto";
 
 export default class AuthenticateService {
-    public static async register(auth, request): Promise<registerResponse | badRequest> {
+    public static async register(auth: HttpContextContract['auth'],data: Partial<UserDto>): Promise<ResponseTypeDTO<LoggerInDto>| ResponseTypeDTO<undefined>>{
         try {
-            const user = await User.create({
-                name: request.input('name'),
-                email: request.input('email'),
-                password: request.input('password'),
-            });
+            const user = new User()
+            await user.fill(data).save()
             const token = await auth.use('api').generate(user, {
                 expiresIn: '60 days'
             })
-
             return {
-                message: "User created successfully",
-                token: token.token
+                status: HTTP_RESPONSE_STATUS.OK,
+                message: RESPONSE_MESSAGES.USER.create,
+                data: {user,token}
             }
-        } catch {
+        } catch(e) {
             return {
-                message: "User creation failed"
+                status: HTTP_RESPONSE_STATUS.BAD_REQUEST,
+                message: RESPONSE_MESSAGES.USER.create,
+                errors: e.message
             }
         }
     }
