@@ -1,9 +1,9 @@
 import User from "App/Models/User";
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { HTTP_RESPONSE_STATUS, LoggerInDto, RESPONSE_MESSAGES, ResponseTypeDTO, UserDto, badRequest, loginResponse, logoutResponse } from "App/Dto";
+import { HTTP_RESPONSE_STATUS, LoggerInDto, RESPONSE_MESSAGES, ResponseTypeDTO, UserDto } from "App/Dto";
 
 export default class AuthenticateService {
-    public static async register(auth: HttpContextContract['auth'],data: Partial<UserDto>): Promise<ResponseTypeDTO<LoggerInDto>| ResponseTypeDTO<undefined>>{
+    public static async register(auth: HttpContextContract['auth'], data: Partial<UserDto>): Promise<ResponseTypeDTO<LoggerInDto> | ResponseTypeDTO<undefined>> {
         try {
             const user = new User()
             await user.fill(data).save()
@@ -11,41 +11,59 @@ export default class AuthenticateService {
                 expiresIn: '60 days'
             })
             return {
-                status: HTTP_RESPONSE_STATUS.OK,
+                status: HTTP_RESPONSE_STATUS.CREATED,
                 message: RESPONSE_MESSAGES.USER.create,
-                data: {user,token}
+                data: { user, token }
             }
-        } catch(e) {
+        } catch (e) {
             return {
-                status: HTTP_RESPONSE_STATUS.BAD_REQUEST,
-                message: RESPONSE_MESSAGES.USER.create,
-                errors: e.message
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                message: e.message,
+                errors: e
             }
         }
     }
 
-    public static async login(auth, request): Promise<loginResponse | badRequest> {
+    public static async login(auth: HttpContextContract['auth'], data: Partial<UserDto>): Promise<ResponseTypeDTO<LoggerInDto> | ResponseTypeDTO<undefined>> {
         try {
-            const email = await request.input('email')
-            const password = await request.input('password')
-            const token = await auth.use('api').attempt(email, password, {
-                expiresIn: '60 days'
+            let user: User = await User.query().where('email', data.email!).firstOrFail();
+            if (!user) {
+                return {
+                    status: HTTP_RESPONSE_STATUS.NOT_FOUND,
+                    message: RESPONSE_MESSAGES.USER.notFound,
+                }
+            }
+            const token = await auth.use('api').generate(user, {
+                expiresIn: '60 days',
             })
             return {
-                message: 'User login successful',
-                token: token.token
+                status: HTTP_RESPONSE_STATUS.OK,
+                message: RESPONSE_MESSAGES.USER.login,
+                data: { user, token }
             }
-        } catch {
+        } catch (e) {
             return {
-                message: 'User login failed'
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                errors: e,
+                message: e.message,
             }
         }
     }
 
-    public static async logout(auth): Promise<logoutResponse> {
-        await auth.use('api').revoke()
-        return {
-            message: 'User logged out'
+    public static async logout(auth: HttpContextContract['auth']): Promise<ResponseTypeDTO<undefined>> {
+        try {
+            await auth.use('api').logout();
+            await auth.use('api').revoke()
+            return {
+                status: HTTP_RESPONSE_STATUS.OK,
+                message: RESPONSE_MESSAGES.USER.logout
+            }
+        } catch (e) {
+            return {
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                errors: e,
+                message: e.message
+            }
         }
     }
 

@@ -2,7 +2,9 @@
     "USER": {
         "create": "User create successfully",
         "login": "User login successfully",
-        "logout": "User logout successfully"
+        "logout": "User logout successfully",
+        "loginFailed": "User login failed",
+        "notFound": "User not found"
     },
 
     "POST": {

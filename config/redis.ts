@@ -41,6 +41,16 @@ export default redisConfig({
       password: Env.get('REDIS_PASSWORD', ''),
       db: 0,
       keyPrefix: '',
+      healthCheck: true
+    },
+
+    auth: {
+      host: Env.get('REDIS_HOST'),
+      port: Env.get('REDIS_PORT'),
+      password: Env.get('REDIS_PASSWORD', ''),
+      db: 1,
+      keyPrefix: 'auth:',
+      healthCheck: true
     },
   },
 })
