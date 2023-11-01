@@ -23,6 +23,9 @@
 import Route from '@ioc:Adonis/Core/Route'
 import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 
+Route.get('/',({response})=>{
+  return response.redirect('/docs')
+})
 
 Route.get('/redis/health', async ({ response }) => {
   const report = await HealthCheck.getReport()
