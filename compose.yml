@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  post-comments-api:
+    image: node:18-alpine
+    container_name: post-comments-api-container
+    restart: always
+    working_dir: /app
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DB_NAME: ${MYSQL_DB_NAME}
+      DB_CONNECTION: ${DB_CONNECTION}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    ports:
+      - ${PORT}:3333
+    env_file:
+      - .env
+    links:
+      - db
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./:/app
+    command: sh -c "yarn install && yarn run dev"
+  db:
+    container_name: post-comments-db-container
+    image: mysql:8.0
+    restart: always
+    volumes:
+      - post-comment-mysql:/var/lib/mysql
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: '${MYSQL_PASSWORD}'
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_DATABASE: '${MYSQL_DB_NAME}'
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    ports:
+      - ${MYSQL_PORT}:3306
+  post-comment-phpmyadmin:
+    container_name: post-comment-phpmyadmin-container
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    links:
+      - db
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      PMA_HOST: ${MYSQL_HOST}
+      PMA_PORT: ${MYSQL_PORT}
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
+      PMA_ARBITRARY: 1
+    ports:
+      - 8080:80
+  redis:
+    container_name: post-comments-redis-container
+    image: redis:alpine
+    restart: always
+    ports:
+      - ${REDIS_PORT}:6379
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - cache:/data
+
+  redisinsight:
+    container_name: post-comments-redis-insight-container
+    image: redislabs/redisinsight
+    restart: always
+    links:
+      - redis
+    depends_on:
+      - redis
+    ports:
+      - 8001:8001
+    volumes:
+      - post-comments-redis-insight:/db
+
+volumes:
+  post-comment-mysql:
+  cache:
+  post-comments-redis-insight:
