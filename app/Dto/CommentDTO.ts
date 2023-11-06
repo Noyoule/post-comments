@@ -8,6 +8,10 @@ export interface Comment {
     created_at: string | null
 }
 
+export interface createCommentDto{
+    content: string
+}
+
 export interface GetAllCommentsResponse {
     message: string
     data: Comment[]

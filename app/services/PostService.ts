@@ -1,77 +1,81 @@
-import { schema } from '@ioc:Adonis/Core/Validator'
-import Media from 'App/Models/Media'
 import Post from "App/Models/Post"
-import Drive from '@ioc:Adonis/Core/Drive'
-import Env from '@ioc:Adonis/Core/Env'
-import { GetPostResponse, PostResponse } from 'App/Dto'
+import { HTTP_RESPONSE_STATUS, PostResponse, RESPONSE_MESSAGES, ResponseTypeDTO, createPostDto } from 'App/Dto'
+import User from 'App/Models/User'
+import { MultipartFileContract } from '@ioc:Adonis/Core/BodyParser';
 
 export default class PostService {
 
-    public static async created(auth, request, response): Promise<PostResponse> {
-        const post: Post = await Post.create({
-            content: request.input('content'),
-            userId: auth.user.id
-        })
-        const filesSchema = schema.create({
-            medias: schema.array().members(
-                schema.file({
-                    size: '2mb',
-                    extnames: ['jpg', 'png'],
-                })
-            ),
-        })
+    public static async created(user: User, data: createPostDto, files?: MultipartFileContract[] | null): Promise<ResponseTypeDTO<Post>> {
         try {
-            if (request.files('medias').length > 0) {
-                const payload = await request.validate({ schema: filesSchema })
-                await Promise.all(
-                    payload.medias.map(async (file) => {
-                        await file.moveToDisk('./media')
-                        const filePath = 'media/' + file.fileName
-                        const media = new Media()
-                        media.path = filePath
-                        media.related('post').associate(post)
+            const post: Post = await Post.create({
+                content: data.content,
+                userId: user.id
+            })
+            //check if file exist 
+            if (files != null) {
+                await Promise.all(files.map(async (file) => {
+                    await file.moveToDisk('./media')
+                    const filePath = 'media/' + file.fileName
+                    await post.related('medias').create({
+                        path: filePath,
                     })
-                )
+                }))
+            }
+            await post.load('medias')
+            await post.load('user')
+            await post.loadCount('likes')
+            return {
+                status: HTTP_RESPONSE_STATUS.CREATED,
+                message: RESPONSE_MESSAGES.POST.create,
+                data: post,
             }
         } catch (e) {
-            response.status(400)
-            response.send({
-                message: "Error during the post creation process"
-            })
-        }
-        return {
-            message: 'Post created successfully'
+            return {
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                message: "Error during the post creation process",
+                errors: e
+            }
         }
     }
 
     //fonction pour liker ou revoker le like sur un post 
-    public static async likeToggle(post_id: number, auth, response): Promise<PostResponse> {
+    public static async likeToggle(postId: number, user: User): Promise<ResponseTypeDTO<undefined>> {
         try {
-            const post = await Post.findOrFail(post_id)
-            const existing_like = await post!.related('likes').query().where('user_id', auth.user.id).first()
+            const post = await Post.find(postId)
+
+            if (!post) {
+                return {
+                    status: HTTP_RESPONSE_STATUS.NOT_FOUND,
+                    message: RESPONSE_MESSAGES.POST.notFound,
+                    errors: new Error(RESPONSE_MESSAGES.POST.notFound)
+                }
+            }
+
+            const existing_like = await post!.related('likes').query().where('user_id', user.id).first()
             if (!existing_like) {
                 post!.related('likes').create({
                     postId: post!.id,
-                    userId: auth.user.id
+                    userId: user.id
                 })
             } else {
                 existing_like.delete()
             }
             return {
+                status: HTTP_RESPONSE_STATUS.OK,
                 message: 'Operation done successfully'
             }
         } catch (e) {
-            response.status(400)
-            return response.status(400).json({
-                message: "Error during the process"
-            });
+            return {
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                message: 'Error during the operation'
+            }
         }
     }
 
     //fonction pour supprimer un post
-    public static async deletePost(post_id: number, auth, response): Promise<PostResponse> {
+    public static async deletePost(postId: number, auth, response): Promise<PostResponse> {
         try {
-            const post = await Post.findOrFail(post_id)
+            const post = await Post.findOrFail(postId)
             //verifier si l'utilisateur connecté est l'auteur de post
             if (post.userId == auth.user.id) {
                 post.delete()
@@ -88,54 +92,43 @@ export default class PostService {
     }
 
     //Fonction pour retourner un post avec les commentaire
-    public static async get(post_id: number, response): Promise<GetPostResponse | PostResponse> {
+    public static async getOne(postId: number): Promise<ResponseTypeDTO<Post>> {
         try {
             const post = await Post.query()
-                .where('id', post_id)
+                .where('id', postId)
                 .preload('comments', (query) => {
                     query.preload('user');
                 }).preload('user')
-                .preload('medias')
                 .preload('likes')
-                .firstOrFail();
+                .first();
 
+            if (!post) {
+                return {
+                    status: HTTP_RESPONSE_STATUS.NOT_FOUND,
+                    message: RESPONSE_MESSAGES.POST.notFound,
+                    errors: new Error(RESPONSE_MESSAGES.POST.notFound)
+                }
+            }
             return {
-                user: {
-                    avatar: 'avatar',
-                    name: post.user.name
-                },
-                created_at: post.createdAt.toJSON(),
-                content: post.content,
-                likes: post.likes.length,
-                medias: await Promise.all(post.medias.map(async (media) => {
-                    const media_url = Env.get('APP_URL') + await Drive.getUrl(media.path);
-                    return media_url;
-                })),
-                comments: post.comments.map((comment) => {
-                    return {
-                        user: {
-                            name: comment.user.name,
-                            avatar: "avatar",
-                        },
-                        id: comment.id,
-                        content: comment.content,
-                        created_at: comment.createdAt.toJSON(),
-                    };
-                })
+                status: HTTP_RESPONSE_STATUS.OK,
+                message: RESPONSE_MESSAGES.POST.getOne,
+                data: post
             }
         } catch (e) {
-            return response.status(400).json({
-                message: e
-            });
+            return {
+                status: HTTP_RESPONSE_STATUS.SERVER_ERROR,
+                message: 'Error during the process',
+                errors: e
+            }
         }
     }
 
     //récupérer une liste paginer de tous les posts
-    public static async getAll(page: number, limit: number){
-        const posts = await Post.query().preload('medias',(mediaQuery)=>{
-         mediaQuery.select('name')
-        }).preload('user',(userQuery)=>{
-            userQuery.select('name','email')
+    public static async getAll(page: number, limit: number) {
+        const posts = await Post.query().preload('medias', (mediaQuery) => {
+            mediaQuery.select('name')
+        }).preload('user', (userQuery) => {
+            userQuery.select('name', 'email')
         }).paginate(page, limit)
         return posts.toJSON()
     }

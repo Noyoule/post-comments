@@ -6,17 +6,17 @@
         "loginFailed": "User login failed",
         "notFound": "User not found"
     },
-
     "POST": {
         "create": "Post create successfully",
         "get": "Post get successfully",
         "delete": "Post deleted successfully",
         "getAll": "all publications obtained successfully",
-        "likeOrDislike": "likes updated on the post"
+        "likeOrDislike": "likes updated on the post",
+        "notFound": "Post not found"
     },
-    
     "COMMENT": {
-        "create":"Comment create successfully",
-        "delete": "Comment deleted successfully"
+        "create": "Comment create successfully",
+        "delete": "Comment deleted successfully",
+        "getAll": "all comments obtained successfully"
     }
 }

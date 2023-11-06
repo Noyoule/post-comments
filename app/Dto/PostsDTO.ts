@@ -4,6 +4,10 @@ export interface PostResponse {
     message: string
 }
 
+export interface createPostDto{
+    content: string,
+
+}
 export interface Post {
     user: {
         name: string
